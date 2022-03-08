@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,  //ソースマップ出力
+        "target": "ES2015",  //出力されるファイルのECMAScriバージョン
+        "lib": ["DOM", "ESNext"],  //組み込まれる型定義
+        "module": "ES2015",  //出力されるファイルのモジュール方式
+        "esModuleInterop": true,  //import記述を import lib from 'lib' に統一
+        "strict": true,  //デフォルトよりも厳しい型チェック
+        "forceConsistentCasingInFileNames": true,  //大文字小文字の区別
+        "noFallthroughCasesInSwitch": true,  //switch分のbreak/return記述チェック
+        "noImplicitReturns": true,  //returnでundefinedが返却されていないかチェック
+        "noUnusedLocals": true,  //利用されていないローカル変数がある場合エラー
+        "noUnusedParameters": true  //利用されていないパラメータがある場合エラー
+    }
+}
