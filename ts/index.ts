@@ -1,8 +1,14 @@
 import { EventListener } from './EventListener'
 import { Task } from './Task'
+import { TaskCollection } from './TaskCollection'
+import { TaskRenderer } from './TaskRenderer'
 
 class Application {
     private readonly eventListner = new EventListener()
+    private readonly taskCollection = new TaskCollection()
+    private readonly taskRenderer = new TaskRenderer(
+        document.getElementById('todoList') as HTMLElement
+    )
 
     start() {
         console.log('hello world')
@@ -31,7 +37,23 @@ class Application {
 
         if(!titleInput.value) return
 
-        const task = new Task({title: titleInput.value})
+        const task = new Task({ title: titleInput.value })
+        this.taskCollection.add(task)
+        //this.taskRenderer.append(task)
+        const { deleteButtonEl } = this.taskRenderer.append(task)
+
+        this.eventListner.add(
+            task.id,
+            'click',
+            deleteButtonEl,
+            () => this.handleClickDeleteTask(task),
+        )
+
+        titleInput.value = ''
+    }
+
+    private handleClickDeleteTask = (task: Task) => {
+        if (!window.confirm('「${task.title}」を削除してよろしいですか?')) return
         console.log(task)
     }
 }
