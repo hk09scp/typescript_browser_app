@@ -7,10 +7,10 @@ type Listeners = {
 }
 
 export class EventListener {
-    private readonly listerners: Listeners = {}
+    private readonly listeners: Listeners = {}
 
     add(listnerId: string, event: string, element: HTMLElement, handler: (e: Event) => void){
-        this.listerners[listnerId] = {
+        this.listeners[listnerId] = {
             event,
             element,
             handler,
@@ -19,9 +19,9 @@ export class EventListener {
     }
 
     remove(listnerId: string) {
-        const lister = this.listerners[listnerId]
-        if(!lister) return
-        lister.element.removeEventListener(lister.event, lister.handler)
-        delete this.listerners[listnerId]
+        const listner = this.listeners[listnerId]
+        if(!listner) return
+        listner.element.removeEventListener(listner.event, listner.handler)
+        delete this.listeners[listnerId]
     }
 }
