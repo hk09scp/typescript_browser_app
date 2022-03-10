@@ -1,6 +1,7 @@
-﻿import dragula from 'dragula'
+﻿import dragula from 'dragula'  //ドラッグ＆ドロップ・ライブラリ
 import { Status, Task, statusMap } from './Task'
 
+//タスク描画クラス
 export class TaskRenderer {
     constructor(
         private readonly todoList: HTMLElement,
@@ -8,13 +9,14 @@ export class TaskRenderer {
         private readonly doneList: HTMLElement,
     ) { }
 
+    //TODOリストにタスク要素を追加
     append(task: Task) {
-        //const taskEl = this.render(task)
         const { taskEl, deleteButtonEl } = this.render(task)
         this.todoList.append(taskEl)
         return { deleteButtonEl }
     }
 
+    //タスク要素を描画
     private render(task: Task) {
         const taskEl = document.createElement('div')
         const spanEl = document.createElement('span')
@@ -31,6 +33,7 @@ export class TaskRenderer {
         return { taskEl, deleteButtonEl }
     }
 
+    //タスク要素を削除
     remove(task: Task) {
         const taskEl = document.getElementById(task.id)
         if (!taskEl) return
@@ -46,6 +49,7 @@ export class TaskRenderer {
         }
     }
 
+    //タスクのドラッグ＆ドロップ
     subscribeDragAndDrop(onDrop: (el: Element, sibling: Element | null, newStatus: Status) => void) {
         dragula([this.todoList, this.doingList, this.doneList]).on('drop', (el, target, _source, sibling) => {
             let newStatus: Status = statusMap.todo
@@ -63,6 +67,7 @@ export class TaskRenderer {
         })
     }
 
+    //タスクのidを取得
     getId(el: Element) {
         return el.id
     }

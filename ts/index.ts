@@ -3,6 +3,7 @@ import { Status, Task, statusMap } from './Task'
 import { TaskCollection } from './TaskCollection'
 import { TaskRenderer } from './TaskRenderer'
 
+//アプリケーション・クラス
 class Application {
     private readonly eventListner = new EventListener()
     private readonly taskCollection = new TaskCollection()
@@ -13,15 +14,14 @@ class Application {
     )
 
     start() {
-        console.log('hello world')
-
         const cerateForm = document.getElementById('createForm') as HTMLElement
         const deleteAllDoneTaskButton  = document.getElementById('deleteAllDoneTask') as HTMLElement
         this.eventListner.add('submit-handler', 'submit', cerateForm, this.handleSubmit)
         this.eventListner.add('click-handler', 'click', deleteAllDoneTaskButton, this.handleClickDeleteAllDoneTask)
-        this.taskRenderer.subscribeDragAndDrop(this.handleDropAndDorp)
+        this.taskRenderer.subscribeDragAndDrop(this.handleDragAndDorp)
     }
 
+    //タスクを作成
     private handleSubmit = (e: Event) => {
         e.preventDefault()
         console.log('submitted')
@@ -45,6 +45,7 @@ class Application {
         titleInput.value = ''
     }
 
+    //タスクを削除
     private handleClickDeleteTask = (task: Task) => {
         if (!window.confirm(`「${task.title}」を削除してよろしいですか?`)) return
         console.log(task)
@@ -53,7 +54,8 @@ class Application {
         this.taskRenderer.remove(task)
     }
 
-    private handleDropAndDorp = (el: Element, sibling: Element | null, newStatus: Status) => {
+    //タスクをドラッグ&ドロップ
+    private handleDragAndDorp = (el: Element, sibling: Element | null, newStatus: Status) => {
         const taskId = this.taskRenderer.getId(el)
         if (!taskId) return
 
@@ -69,6 +71,7 @@ class Application {
         this.taskCollection.update(task)
     }
 
+    //DONEタスクを一括削除
     private handleClickDeleteAllDoneTask = () => {
         if (!window.confirm('DONE のタスクを一括削除してよろしいですか?')) return
 
@@ -77,6 +80,7 @@ class Application {
     }
 }
 
+//画面がロードされたらApplication.start()を実行
 window.addEventListener('load', () => {
     const app = new Application()
     app.start()
