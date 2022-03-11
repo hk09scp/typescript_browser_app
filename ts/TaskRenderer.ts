@@ -1,5 +1,6 @@
 ﻿import dragula from 'dragula'  //ドラッグ＆ドロップ・ライブラリ
 import { Status, Task, statusMap } from './Task'
+import { TaskCollection } from './TaskCollection'
 
 //タスク描画クラス
 export class TaskRenderer {
@@ -16,7 +17,7 @@ export class TaskRenderer {
         return { deleteButtonEl }
     }
 
-    //タスク要素を描画
+    //タスクのHTML要素を生成
     private render(task: Task) {
         const taskEl = document.createElement('div')
         const spanEl = document.createElement('span')
@@ -33,7 +34,7 @@ export class TaskRenderer {
         return { taskEl, deleteButtonEl }
     }
 
-    //タスク要素を削除
+    //タスクのHTML要素を削除
     remove(task: Task) {
         const taskEl = document.getElementById(task.id)
         if (!taskEl) return
@@ -70,5 +71,32 @@ export class TaskRenderer {
     //タスクのidを取得
     getId(el: Element) {
         return el.id
+    }
+
+    //タスク・コレクション・クラスから既存タスクの画面描画した後、配列にして返却
+    renderAll(taskCollection: TaskCollection) {
+        const todoTasks = this.renderList(taskCollection.filter(statusMap.todo), this.todoList)
+        const doingTasks = this.renderList(taskCollection.filter(statusMap.doing), this.doingList)
+        const doneTasks = this.renderList(taskCollection.filter(statusMap.doing), this.doneList)
+
+        return [...todoTasks, ...doingTasks, ...doneTasks]
+    }
+
+    //引数tasksに格納されたタスクのHTML要素を引数listEl要素に描画
+    private renderList(tasks: Task[], listEl: HTMLElement) {
+        if (tasks.length === 0) return []
+
+        const taskList: Array<{
+            task: Task
+            deleteButtonEl: HTMLButtonElement
+        }> = []
+
+        tasks.forEach((task) => {
+            const { taskEl, deleteButtonEl } = this.render(task)
+            listEl.append(taskEl)
+            taskList.push({task, deleteButtonEl })
+        })
+
+        return taskList
     }
 }

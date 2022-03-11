@@ -5,19 +5,28 @@ import { TaskRenderer } from './TaskRenderer'
 
 //アプリケーション・クラス
 class Application {
-    private readonly eventListner = new EventListener()
-    private readonly taskCollection = new TaskCollection()
+    private readonly eventListner = new EventListener()  //リスナークラス
+    private readonly taskCollection = new TaskCollection()  //タスククラス
     private readonly taskRenderer = new TaskRenderer(
         document.getElementById('todoList') as HTMLElement,
         document.getElementById('doingList') as HTMLElement,
         document.getElementById('doneList') as HTMLElement,
-    )
+    )  //HTML要素
 
     start() {
+        const taskItems = this.taskRenderer.renderAll(this.taskCollection)
         const cerateForm = document.getElementById('createForm') as HTMLElement
-        const deleteAllDoneTaskButton  = document.getElementById('deleteAllDoneTask') as HTMLElement
+        const deleteAllDoneTaskButton = document.getElementById('deleteAllDoneTask') as HTMLElement
+
+        //イベントリスナー
+        taskItems.forEach(({ task, deleteButtonEl }) => {
+            this.eventListner.add(task.id, 'click', deleteButtonEl,
+            () => this.handleClickDeleteTask(task))
+        })
         this.eventListner.add('submit-handler', 'submit', cerateForm, this.handleSubmit)
         this.eventListner.add('click-handler', 'click', deleteAllDoneTaskButton, this.handleClickDeleteAllDoneTask)
+
+        //ドラッグ＆ドロップによるタスクの更新
         this.taskRenderer.subscribeDragAndDrop(this.handleDragAndDorp)
     }
 
@@ -49,12 +58,10 @@ class Application {
     private handleClickDeleteTask = (task: Task) => {
         if (!window.confirm(`「${task.title}」を削除してよろしいですか?`)) return
         console.log(task)
-        this.eventListner.remove(task.id)
-        this.taskCollection.delete(task)
-        this.taskRenderer.remove(task)
+        this.executeDeleteTask(task)
     }
 
-    //タスクをドラッグ&ドロップ
+    //タスクを更新
     private handleDragAndDorp = (el: Element, sibling: Element | null, newStatus: Status) => {
         const taskId = this.taskRenderer.getId(el)
         if (!taskId) return
@@ -69,6 +76,18 @@ class Application {
 
         task.update({ status: newStatus })
         this.taskCollection.update(task)
+
+        if (sibling) {
+            const nextTaskId = this.taskRenderer.getId(sibling)
+            if (!nextTaskId) return
+
+            const nextTask = this.taskCollection.find(nextTaskId)
+            if (!nextTask) return
+
+            this.taskCollection.moveAboveTarget(task, nextTask)
+        } else {
+            this.taskCollection.moveToLast(task)
+        }
     }
 
     //DONEタスクを一括削除
@@ -76,7 +95,14 @@ class Application {
         if (!window.confirm('DONE のタスクを一括削除してよろしいですか?')) return
 
         const doneTasks = this.taskCollection.filter(statusMap.done)
-        console.log(doneTasks)
+        doneTasks.forEach((task) => this.executeDeleteTask(task))
+    }
+
+    //タスク関連オブジェクトを削除
+    private executeDeleteTask = (task: Task) => {
+        this.eventListner.remove(task.id)
+        this.taskCollection.delete(task)
+        this.taskRenderer.remove(task)
     }
 }
 
