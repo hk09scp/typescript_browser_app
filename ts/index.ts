@@ -20,11 +20,11 @@ class Application {
 
         //イベントリスナー
         taskItems.forEach(({ task, deleteButtonEl }) => {
-            this.eventListner.add(task.id, 'click', deleteButtonEl,
-            () => this.handleClickDeleteTask(task))
+            this.eventListner.add('click', deleteButtonEl,
+                () => this.handleClickDeleteTask(task), task.id)
         })
-        this.eventListner.add('submit-handler', 'submit', cerateForm, this.handleSubmit)
-        this.eventListner.add('click-handler', 'click', deleteAllDoneTaskButton, this.handleClickDeleteAllDoneTask)
+        this.eventListner.add('submit', cerateForm, this.handleSubmit)
+        this.eventListner.add('click', deleteAllDoneTaskButton, this.handleClickDeleteAllDoneTask)
 
         //ドラッグ＆ドロップによるタスクの更新
         this.taskRenderer.subscribeDragAndDrop(this.handleDragAndDorp)
@@ -45,10 +45,10 @@ class Application {
         const { deleteButtonEl } = this.taskRenderer.append(task)
 
         this.eventListner.add(
-            task.id,
             'click',
             deleteButtonEl,
             () => this.handleClickDeleteTask(task),
+            task.id,
         )
 
         titleInput.value = ''
